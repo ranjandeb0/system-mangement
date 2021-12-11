@@ -105,6 +105,24 @@
 					                    $metatags       =   $row['metatags'];
 					                    $status         =   $row['status'];
 
+					                    $sql  = "SELECT * FROM comments WHERE reply_of is not null and post_id='$post_id' and status = '1'";
+										$comment_res	= mysqli_query($db, $sql);
+										if(!$comment_res){
+											die("MySqli Error: " . mysqli_error($db));
+										}
+										else{
+											$replies_count	=	mysqli_num_rows($comment_res);
+										}
+
+										$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$post_id' and status = '1'";
+										$comment_res	= mysqli_query($db, $sql);
+										if(!$comment_res){
+											die("MySqli Error: " . mysqli_error($db));
+										}
+										else{
+											$comments_count	=	mysqli_num_rows($comment_res);
+										}
+
 					                    $sql       = "SELECT cat_title FROM categories WHERE cat_id='$category_id'";
 										$res1 = mysqli_query($db, $sql);
 										if(!$res1){
@@ -114,66 +132,97 @@
 											$row        = mysqli_fetch_assoc($res1);
 											$cat_name	= $row['cat_title'];
 	                          			}
-								?>
-								<div class="card post my-4">
-									<?php if (!empty($image)): ?>
-									<div class="post-img" >
-										<div class="post-bg-img" style="background-image: url('assets/img/posts/<?php echo $image ?>');"></div>
-										<img src="assets/img/posts/<?php echo $image ?>">
-									</div>
-									<?php endif ?>
-
-									<div class="post-title-box">
-										<h4 class="post-title mt-4 mb-0"><?php echo $post_title; ?></h4>
-									</div>
-									<div class="post-author-details mb-3">
-										<?php 
-				                          $sql  = "SELECT * FROM users WHERE id='$author_id'";
-				                          $res1 	= mysqli_query($db, $sql);
-				                          if(!$res1){
-				                            die("MySqli Error: " . mysqli_error($db));
-				                          }
-				                          else{
-				                            $row   = mysqli_fetch_assoc($res1);
-				                            $author_name 	= $row['fullname'];
-				                            $author_image 	= $row['image'];
-				                          }
-				                        ?>
-				                        <div class="post-date-time">
-											<span class="text-warning "><?php echo $cat_name ?></span>
-											<p class="m-0 text-warning d-inline"> - <?php echo $post_datetime; ?></p>
-											<h6 class="m-0 text-warning d-inline"> - <?php echo $author_name ?></h6>
-										</div>
-										
-										<?php if($loggedIn && $logged_user_id == $author_id){ ?>
-											<div class="user-image ms-auto">
-												<img src="admin/dist/img/users/<?php echo (empty($author_image))? 'default-img.png' : $author_image ;?>" alt = "author image">	
+										?>
+										<div class="card post my-4 pb-4">
+											<?php if (!empty($image)): ?>
+											<div class="post-img mb-4" >
+												<div class="post-bg-img" style="background-image: url('assets/img/posts/<?php echo $image ?>');"></div>
+												<img src="assets/img/posts/<?php echo $image ?>">
 											</div>
-										<?php } ?>
-									</div>
-									<div class="post-content">
-										<p><?php echo $post_content?></p>
-									</div>
-									<div class="likes">
-										<p class="m-0 py-2 text-info"> 13 People Likes this</p>
-									</div>
-									<?php if($loggedIn){ ?>
-									<div class="actions">
-										<ul>
-											<li>Like</li>
-											<li>Comment</li>
-											<li>Follow</li>
-										</ul>
-									</div>
-									<?php } ?>
-								</div>
-							<?php
+											<?php endif ?>
+
+											<div class="post-title-box">
+												<h4 class="post-title mb-0"><?php echo $post_title; ?></h4>
+											</div>
+											<div class="post-author-details mb-3">
+												<?php 
+						                          $sql  = "SELECT * FROM users WHERE id='$author_id'";
+						                          $res1 	= mysqli_query($db, $sql);
+						                          if(!$res1){
+						                            die("MySqli Error: " . mysqli_error($db));
+						                          }
+						                          else{
+						                            $row   = mysqli_fetch_assoc($res1);
+						                            $author_name 	= $row['fullname'];
+						                            $author_image 	= $row['image'];
+						                          }
+						                        ?>
+						                        <div class="post-date-time">
+													<span class="text-warning "><?php echo $cat_name ?></span>
+													<p class="m-0 text-warning d-inline"> - <?php echo $post_datetime; ?></p>
+													<h6 class="m-0 text-warning d-inline"> - <?php echo $author_name ?></h6>
+												</div>
+												
+												<?php if($loggedIn && $logged_user_id == $author_id){ ?>
+													<div class="user-image ms-auto">
+														<img src="admin/dist/img/users/<?php echo (empty($author_image))? 'default-img.png' : $author_image ;?>" alt = "author image">	
+													</div>
+												<?php } ?>
+											</div>
+											<div class="post-content">
+												<p><?php echo $post_content?></p>
+											</div>
+											<div class="post-info">
+												<p class="m-0 text-info"> 13 People Likes this</p>
+												<p class="m-0 text-info"> <?php echo "{$comments_count} comment". (($comments_count>1)? "s": "") ." & {$replies_count} ". (($replies_count>1)? "replies": "reply") ?></p>
+											</div>
+											<?php if($loggedIn){ ?>
+													<div class="actions mb-2">
+														<ul>
+															<li>Like</li>
+															<li>Comment</li>
+															<li>Follow</li>
+														</ul>
+													</div>
+													<?php 
+												} 
+												if ($comments_count>0) { ?>
+													<div class="comment-container">
+														<h5 class="comment-heading my-2 border-bottom">Comments</h5>
+														<div class="ps-2">
+															<?php 
+																readAndPrintComments($db, $comment_res, 2); 
+																if($comments_count>2){
+																?>
+																<span class="view-more-comments" data="<?php echo $post_id ?>">See more comments</span>
+															<?php } ?>
+														</div>
+													</div>
+													<?php 
+												}
+												if(!$loggedIn){ 
+													echo "<p class='text-comment-log mb-0'>To post comment you must log in.</p>";
+											 	}
+											 	else{
+											 		?>
+											 		<form class="comment-form mt-3">
+										 				<div class="user-image ms-auto">
+															<img src="admin/dist/img/users/<?php echo (empty($author_image))? 'default-img.png' : $author_image ;?>" alt = "author image">	
+														</div>
+											 			<div class="input-group">
+											 				<input class="form-control bg-transparent text-white" name="comment-text" placeholder="type your comment here.." type="text" autocomplete="off" />
+											 				<input class="btn bg-gradient border-white text-white" type="submit" name="comment" />
+											 			</div>
+											 		</form>
+											 		<?php
+											 	}
+											 ?>
+										</div>
+									<?php
 									}
 								}
 								else{
-							?>
-									<div class="alert alert-info mt-4">No Available Posts to Show.</div>
-							<?php
+									echo "<div class='alert alert-info mt-4'>No Available Posts to Show.</div>";
 								}
 							?>
 						</div>

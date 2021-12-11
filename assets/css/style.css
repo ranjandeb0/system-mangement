@@ -208,7 +208,7 @@ header .cat-nav .dropdown-menu{
 	margin-left: auto;
 	column-gap: 10px;
 }
-.read-post .post-author-details .user-image{
+.read-post .user-image{
 	--user-img-radius: 25px;
 	width: var(--user-img-radius);
 	height: var(--user-img-radius);
@@ -218,7 +218,7 @@ header .cat-nav .dropdown-menu{
 	overflow: hidden;
 	border-radius: 50%;
 }
-.read-post .post-author-details .user-image img{
+.read-post .user-image img{
 	min-width: 100%;
 	min-height: 100%;
 }
@@ -254,17 +254,80 @@ header .cat-nav .dropdown-menu{
 	max-height: 350px;
 	box-shadow: 0 0 15px #333;
 }
+.read-post .post-info{
+	display: flex;
+	justify-content: space-between;
+}
 .read-post .post .actions ul{
 	display: flex;
-	border-top: 1px solid #999;
+    column-gap: 5px;
+    cursor: pointer;
 }
 .read-post .post .actions ul li{
 	flex-grow: 1;
     text-align: center;
     padding: 10px 0;
-    border-radius: 5px;
+    border-radius: 3px;
+    background: #3c434a;
     transition: 0.3s ease-in-out;
 }
 .read-post .post .actions ul li:hover{
 	background: #474f56;
+}
+.read-post .comment .comment-info{
+	display: flex;
+	column-gap: 10px;
+	align-items: center;
+}
+.read-post .comment .author-image{
+	--author-img-radius: 25px;
+    width: var(--author-img-radius);
+	height: var(--author-img-radius);
+    overflow: hidden;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.read-post .comment .author-image img{
+	min-width: 100%;
+	min-height: 100%;
+	cursor: pointer;
+}
+.read-post .comment .author{
+	font-weight: 600;
+	cursor: pointer;
+}
+.read-post .comment .time-delta{
+	color: #aaa;
+}
+.read-post .comment-action .action-list{
+	display: flex;
+	column-gap: 10px;
+}
+.read-post .comment-action .action{
+	color: #ccc;
+	cursor: pointer;
+}
+.read-post .comment-action .action:hover{
+	color: #fff;
+	transition: 0.3s ease-in-out;
+}
+.read-post .link-colored{
+	color: lightskyblue;
+	cursor: pointer;
+}
+.read-post .link-colored:hover{
+	text-decoration: underline;
+}
+.read-post .text-comment-log{
+	color: #aaa;
+}
+.read-post .comment-form{
+	display: flex;
+	align-items: center;
+	column-gap: 10px;
+}
+.read-post .comment-form .user-image{
+	--user-img-radius: 30px;
 }

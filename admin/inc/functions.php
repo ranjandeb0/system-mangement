@@ -459,4 +459,76 @@
     }
 	}
 
+	function readAndPrintComments($db, $comment_res, bool $reply = false, int $limit = null){
+		if(! $comment_res instanceof mysqli_result){
+			if($reply){
+				$sql = "SELECT * FROM comments WHERE reply_of = '$comment_res' and status = '1' ORDER BY id asc". (!empty($limit) ? "LIMIT {$limit}": "");
+			}else{
+				$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$post_id' and status = '1' ORDER BY id desc". (!empty($limit) ? "LIMIT {$limit}": "");
+			}
+			$comment_res = mysqli_query($db, $sql);
+			if (!$comment_res) {
+				die("Error: " . mysqli_error($db));
+			}
+		}
+
+		while ($row   = mysqli_fetch_assoc($comment_res)) {
+				$id 			= 	$row['id'];
+				$author_id 		= 	$row['author_id'];
+				$comment 		= 	$row['comment'];
+				$date_time_diff = 	date_diff(new DateTime($row['date_time']), new DateTime());
+				$sql 			= 	"SELECT fullname,image FROM users WHERE id = '$author_id'";
+				$sub_res 		= 	mysqli_query($db, $sql);
+				$row 			= 	mysqli_fetch_assoc($sub_res);
+				$author_name	=	$row['fullname'];
+				$author_image	=	$row['image'];
+
+				if($date_time_diff->y != 0){
+					$date_time 		= 	$date_time_diff->format('%y year(s) ago');
+				}
+				else if($date_time_diff->m != 0){
+					$date_time 		= 	$date_time_diff->format('%m month(s) ago');
+				}
+				else if($date_time_diff->d != 0){
+					$date_time 		= 	$date_time_diff->format('%d day(s) ago');
+				}
+				else if($date_time_diff->h != 0){
+					$date_time 		= 	$date_time_diff->format('%h hour(s) ago');
+				}
+				else{
+					$date_time 		= 	$date_time_diff->format('%i minute(s) ago');
+				}
+			?>
+				<div class="comment py-2">
+					<div class="comment-info">
+						<div class="author-image" data="<?php echo $author_id ?>"><img src="admin/dist/img/users/<?php echo (empty($author_image))?  'default-img.png' :  $author_image ?>"  alt="Author Image"></div>
+						<div class="author" data="<?php echo $author_id ?>"><?php echo $author_name; ?></div>
+						<div class="time-delta"><?php echo $date_time ?></div>
+					</div>
+					<div class="comment-text"><?php echo $comment; ?></div>
+					<div class="comment-action">
+						<ul class="action-list">
+							<li>
+								<span class="action like" data="<?php echo $id; ?>">like</span>
+							</li>
+							<li>
+								<span class="action reply" data="<?php echo $id; ?>">reply</span>
+							</li>
+						</ul>
+					</div>
+					<?php 
+						$sql = "SELECT * FROM comments WHERE reply_of = '$id' and status = '1' ORDER BY id asc";
+						$sub_res = mysqli_query($db, $sql);
+						if (!$sub_res) {
+							die("Error: " . mysqli_error($db));
+						}
+						if(mysqli_num_rows($sub_res) > 0){
+							echo "<span class='view-replies link-colored' data='{$id}'>---See replies</span>";
+						}
+					?>
+				</div>
+			<?php
+		}
+	}
+
 ?>
