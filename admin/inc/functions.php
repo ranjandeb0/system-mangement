@@ -1,6 +1,6 @@
 <?php
 	include "globalVariables.php"; //This consists of all the global variable used in this php file
-
+	
 
 	// Read post from a category and all it's subcategory function 
 	function readpost($db, $main_cat_id = null){
@@ -163,7 +163,7 @@
         $cat_id       =   $row['cat_id'];
         $cat_title    =   $row['cat_title'];
 		?>
-				<option value="<?php echo $cat_id;?>" <?php echo (strcasecmp($cat_title, "uncategorized") == 0 && $do == "post")? "selected" : "" ;?> <?php if($do == "add" && !empty($parent_cat_id) && $parent_cat_id == $cat_id){echo "selected"; $parent_cat_id = null;} ?>><?php echo $cat_title;?></option>
+				<option value="<?php echo $cat_id;?>" <?php echo (strcasecmp($cat_title, "uncategorized") == 0 && $do == "post")? "selected" : "" ;?> <?php if($do == "add" && !empty($parent_cat_id) && $parent_cat_id == $cat_id){echo "selected"; $parent_cat_id = null;} ?>></option>
 		<?php
 				
 				if (empty($parent_cat_id)) {
@@ -459,12 +459,19 @@
     }
 	}
 
-	function readAndPrintComments($db, $comment_res, bool $reply = false, int $limit = null){
+	function readAndPrintComments($db, $comment_res, bool $reply = false, int $limit = 0, int $singleComment = 0, int $fromBefore = 0){
+		global $logged_user_id;
+
 		if(! $comment_res instanceof mysqli_result){
 			if($reply){
-				$sql = "SELECT * FROM comments WHERE reply_of = '$comment_res' and status = '1' ORDER BY id asc". (!empty($limit) ? "LIMIT {$limit}": "");
+				$sql = "SELECT * FROM comments WHERE reply_of = '$comment_res' and status = '1' ORDER BY id asc". (($limit > 0)? " LIMIT {$limit}": "");
 			}else{
-				$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$post_id' and status = '1' ORDER BY id desc". (!empty($limit) ? "LIMIT {$limit}": "");
+				if($fromBefore > 0){
+					$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$comment_res'". (($singleComment > 0) ? " AND id = '{$singleComment}' OR id < '{$fromBefore}'": "AND id < '{$fromBefore}'") . " and status = '1' ORDER BY id desc". (($limit > 0) ? " LIMIT {$limit}": "");
+				}
+				else{
+					$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$comment_res'". (($singleComment > 0) ? " and id = '{$singleComment}'": "") . " and status = '1' ORDER BY id desc". (($limit > 0) ? " LIMIT {$limit}": "");
+				}
 			}
 			$comment_res = mysqli_query($db, $sql);
 			if (!$comment_res) {
@@ -476,6 +483,7 @@
 				$id 			= 	$row['id'];
 				$author_id 		= 	$row['author_id'];
 				$comment 		= 	$row['comment'];
+				date_default_timezone_set('Asia/Dhaka');
 				$date_time_diff = 	date_diff(new DateTime($row['date_time']), new DateTime());
 				$sql 			= 	"SELECT fullname,image FROM users WHERE id = '$author_id'";
 				$sub_res 		= 	mysqli_query($db, $sql);
@@ -484,35 +492,44 @@
 				$author_image	=	$row['image'];
 
 				if($date_time_diff->y != 0){
-					$date_time 		= 	$date_time_diff->format('%y year(s) ago');
+					$date_time 		= 	$date_time_diff->format('%y year' . (($date_time_diff->y > 1)? 's' : '') . ' ago');
 				}
 				else if($date_time_diff->m != 0){
-					$date_time 		= 	$date_time_diff->format('%m month(s) ago');
+					$date_time 		= 	$date_time_diff->format('%m month' . (($date_time_diff->m > 1)? 's' : '') . ' ago');
 				}
 				else if($date_time_diff->d != 0){
-					$date_time 		= 	$date_time_diff->format('%d day(s) ago');
+					$date_time 		= 	$date_time_diff->format('%d day' . (($date_time_diff->d > 1)? 's' : '') . ' ago');
 				}
 				else if($date_time_diff->h != 0){
-					$date_time 		= 	$date_time_diff->format('%h hour(s) ago');
+					$date_time 		= 	$date_time_diff->format('%h hour' . (($date_time_diff->h > 1)? 's' : '') . ' ago');
 				}
 				else{
-					$date_time 		= 	$date_time_diff->format('%i minute(s) ago');
+					$date_time 		= 	$date_time_diff->format('%i minute' . (($date_time_diff->i > 1)? 's' : '') . ' ago');
 				}
 			?>
-				<div class="comment py-2">
+				<div class="comment py-2" data="<?php echo $id; ?>">
 					<div class="comment-info">
 						<div class="author-image" data="<?php echo $author_id ?>"><img src="admin/dist/img/users/<?php echo (empty($author_image))?  'default-img.png' :  $author_image ?>"  alt="Author Image"></div>
 						<div class="author" data="<?php echo $author_id ?>"><?php echo $author_name; ?></div>
 						<div class="time-delta"><?php echo $date_time ?></div>
+						<?php if($logged_user_id === $author_id) {?>
+							<div class="user-control ms-auto">
+								<i class="fas fa-ellipsis-h" id="dropdownMenuLink" data-bs-toggle="dropdown"></i>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+							    <li class="dropdown-item edit-comment">Edit</li>
+							    <li class="dropdown-item delete-comment">Delete</li>
+							  </ul>
+							</div>
+						<?php } ?>
 					</div>
 					<div class="comment-text"><?php echo $comment; ?></div>
 					<div class="comment-action">
 						<ul class="action-list">
 							<li>
-								<span class="action like" data="<?php echo $id; ?>">like</span>
+								<span class="action like">like</span>
 							</li>
 							<li>
-								<span class="action reply" data="<?php echo $id; ?>">reply</span>
+								<span class="action reply">reply</span>
 							</li>
 						</ul>
 					</div>
@@ -529,6 +546,21 @@
 				</div>
 			<?php
 		}
+	}
+
+	function generateCommentForm(int $post_parent_id){
+		global $logged_user_image;
+		?>
+			<form style="display:none" class="comment-form mt-3" data="<?php echo $post_parent_id ?>">
+ 				<div class="user-image ms-auto">
+					<img src="admin/dist/img/users/<?php echo (empty($logged_user_image))?  'default-img.png' :  $logged_user_image ?>"  alt="User Image">
+				</div>
+	 			<div class="input-group">
+	 				<textarea rows="2" style="resize: none;" class="form-control bg-transparent text-white" name="comment-text" placeholder="type your comment here.." autocomplete="off" ></textarea> 
+	 				<input class="btn bg-gradient border-white text-white" type="submit" name="submit-comment"  />
+	 			</div>
+	 		</form>
+		<?php
 	}
 
 ?>

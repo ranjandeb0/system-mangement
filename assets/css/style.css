@@ -274,12 +274,12 @@ header .cat-nav .dropdown-menu{
 .read-post .post .actions ul li:hover{
 	background: #474f56;
 }
-.read-post .comment .comment-info{
+.comment .comment-info{
 	display: flex;
 	column-gap: 10px;
 	align-items: center;
 }
-.read-post .comment .author-image{
+.comment .author-image{
 	--author-img-radius: 25px;
     width: var(--author-img-radius);
 	height: var(--author-img-radius);
@@ -289,45 +289,82 @@ header .cat-nav .dropdown-menu{
     align-items: center;
     justify-content: center;
 }
-.read-post .comment .author-image img{
+.comment .author-image img{
 	min-width: 100%;
 	min-height: 100%;
 	cursor: pointer;
 }
-.read-post .comment .author{
+.comment .author{
 	font-weight: 600;
 	cursor: pointer;
 }
-.read-post .comment .time-delta{
+.comment .time-delta{
 	color: #aaa;
 }
-.read-post .comment-action .action-list{
+.comment-action .action-list{
 	display: flex;
 	column-gap: 10px;
 }
-.read-post .comment-action .action{
+.comment-action .action{
 	color: #ccc;
 	cursor: pointer;
 }
-.read-post .comment-action .action:hover{
+.comment-action .action:hover{
 	color: #fff;
 	transition: 0.3s ease-in-out;
 }
-.read-post .link-colored{
+.link-colored{
 	color: lightskyblue;
 	cursor: pointer;
 }
-.read-post .link-colored:hover{
+.link-colored:hover{
 	text-decoration: underline;
 }
-.read-post .text-comment-log{
+.text-comment-log{
 	color: #aaa;
 }
-.read-post .comment-form{
+.comment-form{
 	display: flex;
 	align-items: center;
 	column-gap: 10px;
 }
-.read-post .comment-form .user-image{
+.comment-form .user-image{
 	--user-img-radius: 30px;
+}
+.comment .comment-text {
+    padding: 8px 16px;
+    background: #3c434a;
+    border-radius: 5px;
+    margin: 9px 0 1px -2px;
+}
+.comment .user-control i{
+	padding: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #aaa;
+}
+.user-control i:hover{
+	color: #ccc;
+	transition: 0.3s ease-in-out;
+}
+.user-control .dropdown-menu{
+	min-width: 120px;
+	padding: 0;
+	background: #343a40;
+}
+.user-control .dropdown-menu .dropdown-item{
+	color: #ccc;
+	border: 1px solid #474f56;
+	cursor: pointer;
+}
+.user-control .dropdown-menu .dropdown-item:not(:last-child){
+	border-bottom: 0px;
+}
+.user-control .dropdown-menu .dropdown-item:hover{
+	background: #3c434a;
+	color: #fff;
+	transition: 0.2s ease-in;
+}
+.comment-box span+span{
+	margin: 0 15px;
 }

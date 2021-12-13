@@ -133,7 +133,7 @@
 											$cat_name	= $row['cat_title'];
 	                          			}
 										?>
-										<div class="card post my-4 pb-4">
+										<div class="card post my-4 pb-4"  data="<?php echo $post_id ?>">
 											<?php if (!empty($image)): ?>
 											<div class="post-img mb-4" >
 												<div class="post-bg-img" style="background-image: url('assets/img/posts/<?php echo $image ?>');"></div>
@@ -179,9 +179,9 @@
 											<?php if($loggedIn){ ?>
 													<div class="actions mb-2">
 														<ul>
-															<li>Like</li>
-															<li>Comment</li>
-															<li>Follow</li>
+															<li class="like-btn">Like</li>
+															<li class="comment-gen-btn show" data ="<?php echo $post_id ?>">Comment</li>
+															<li class="follow-btn">Follow</li>
 														</ul>
 													</div>
 													<?php 
@@ -189,12 +189,12 @@
 												if ($comments_count>0) { ?>
 													<div class="comment-container">
 														<h5 class="comment-heading my-2 border-bottom">Comments</h5>
-														<div class="ps-2">
+														<div class="comment-box px-2">
 															<?php 
-																readAndPrintComments($db, $comment_res, 2); 
+																readAndPrintComments($db, $post_id, false, 2); 
 																if($comments_count>2){
 																?>
-																<span class="view-more-comments" data="<?php echo $post_id ?>">See more comments</span>
+																<span class="view-more-comments link-colored">See more comments</span>
 															<?php } ?>
 														</div>
 													</div>
@@ -203,20 +203,8 @@
 												if(!$loggedIn){ 
 													echo "<p class='text-comment-log mb-0'>To post comment you must log in.</p>";
 											 	}
-											 	else{
-											 		?>
-											 		<form class="comment-form mt-3">
-										 				<div class="user-image ms-auto">
-															<img src="admin/dist/img/users/<?php echo (empty($author_image))? 'default-img.png' : $author_image ;?>" alt = "author image">	
-														</div>
-											 			<div class="input-group">
-											 				<input class="form-control bg-transparent text-white" name="comment-text" placeholder="type your comment here.." type="text" autocomplete="off" />
-											 				<input class="btn bg-gradient border-white text-white" type="submit" name="comment" />
-											 			</div>
-											 		</form>
-											 		<?php
-											 	}
 											 ?>
+
 										</div>
 									<?php
 									}
