@@ -313,9 +313,12 @@ header .cat-nav .dropdown-menu{
 	color: #ccc;
 	cursor: pointer;
 }
-.comment-action .action:hover{
+.comment-action .action:not(.reacted):hover{
 	color: #fff;
 	transition: 0.3s ease-in-out;
+}
+.comment-action .action.reacted{
+	color: #0393ff;
 }
 .link-colored{
 	color: lightskyblue;

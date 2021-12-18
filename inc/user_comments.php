@@ -48,8 +48,8 @@
 	}
 
 	if($type == "comment"){
-		if(isset($_POST['singleComment'])){
-			if(!empty($_POST['fromBefore'])){
+		if(isset($_POST['singleComment']) && !empty($_POST['singleComment'])){
+			if(isset($_POST['fromBefore']) && !empty($_POST['fromBefore'])){
 				readAndPrintComments($db, $pid, false, $limit, $_POST['singleComment'], $_POST['fromBefore']);
 			}
 			else{
@@ -57,7 +57,7 @@
 			}
 		}
 		else{
-			if(isset($_POST['fromBefore'])){
+			if(isset($_POST['fromBefore']) && !empty($_POST['fromBefore'])){
 				readAndPrintComments($db, $pid, false, $limit, 0, $_POST['fromBefore']);
 			}
 			else{

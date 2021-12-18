@@ -53,7 +53,7 @@ $(document).ready(function(){
                 showComments(prevElement, parseInt(id), parseInt(postedComment));
               }
               else{
-                showComments(prevElement, id);
+                showComments(prevElement, parseInt(id));
               }
             }
           });
@@ -96,7 +96,7 @@ $(document).ready(function(){
             var html = "<div class='commented' style='display:none'>" + res + "</div>"
             $(html).insertBefore(topComment).slideDown(300, "swing");
           }else if(prevElement.hasClass("actions")){
-            var html = "<div class='comment-container' style='display:none'><h5 class='comment-heading my-2 border-bottom'>Comments</h5><div class='comment-box px-2'><div class='commented' style='display:none'>" + res + "</div></div></div>"
+            var html = "<div class='comment-container' style='display:none'><h5 class='comment-heading my-2 border-bottom'>Comments</h5><div class='comment-box px-2'><div class='commented'>" + res + "</div></div></div>"
             $(html).insertAfter(prevElement).slideDown(300, "swing");
           }
           prevElement.closest(".post").find(".comment-gen-btn").click();
@@ -278,19 +278,28 @@ $(document).ready(function(){
     $(document).on("click", ".user-control .delete-comment", function(){
       var comment = $(this).closest(".comment");
       var id = comment.attr('data');
+      console.log(comment.parent().find(".comment").length);
       $.ajax({
               url: "inc/user_comments.php",
               method: "POST",
               data: {id: id, type: "delete"},
               success: function(){
-                comment.animate({ height: 0, opacity: 0 }, function(){
-                  comment.remove();
-                });
+                if(comment.parent().find(".comment").length > 1){
+                  comment.animate({ height: 0, opacity: 0 }, function(){
+                    comment.remove();
+                  });
+                }
+                else{
+                  comment.closest(".comment-container").animate({ height: 0, opacity: 0 }, function(){
+                    comment.remove();
+                  });
+                }
               }
             });
     });
 
     function submitCommentEdit(comment, oldText, newText){
+      if(newText != "" && newText != null){
         comment.children("[name='comment-text']").replaceWith("<div style='position:relative' class='comment-text'><div class='cover' style='background:#ccc;position:absolute;top:0;left:0;width:100%;height:100%;border-radius: 5px;'></div>"+newText+"</div>");
         comment.children(".comment-text").children(".cover").fadeOut(1000, function(){
           this.remove();
@@ -309,15 +318,19 @@ $(document).ready(function(){
           this.remove();
         });
       }
+    }
 
     $(document).on("click", ".user-control .edit-comment", function(){
       var comment = $(this).closest(".comment");
       var text = comment.children(".comment-text").text();
       var height = comment.children(".comment-text").height();
 
-      comment.children(".comment-text").replaceWith(`<textarea style="resize: none;margin: 9px 0 1px -2px;height:`+height+`px" class="form-control bg-transparent text-white" name="comment-text" placeholder="type your comment here.." autocomplete="off" >`+text+`</textarea>`);
-      
+      comment.children(".comment-text").replaceWith($(`<textarea style="resize: none;margin: 9px 0 1px -2px;height:`+height+`px" class="form-control bg-transparent text-white" name="comment-text" placeholder="type your comment edition here.." autocomplete="off" >`+text+`</textarea>`));
+
       $(`<li style="display:none; margin-left:auto"><span class="action cancel">cancel</span></li><li style="display:none"><span class="action save">save</span></li>`).appendTo(comment.children(".comment-action").children(".action-list")).fadeIn();
+      var strLength = comment.children("textarea").val().length;
+      comment.children("textarea").focus();
+      comment.children("textarea")[0].setSelectionRange(strLength, strLength);
 
 
       comment.children("[name='comment-text']").on("keydown", function(e){

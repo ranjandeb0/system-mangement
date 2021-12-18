@@ -496,6 +496,24 @@
 				$author_name	=	$row['fullname'];
 				$author_image	=	$row['image'];
 
+				$sql  = "SELECT * FROM comment_reactions WHERE comment_id='$id' AND user_id='$logged_user_id'";
+				$react_res	= mysqli_query($db, $sql);
+				if(!$react_res){
+					die("MySqli Error: " . mysqli_error($db));
+				}
+				else{
+					$reacted	=	mysqli_num_rows($react_res);
+				}
+
+				$sql  = "SELECT * FROM comment_reactions WHERE comment_id='$id'";
+				$react_res	= mysqli_query($db, $sql);
+				if(!$react_res){
+					die("MySqli Error: " . mysqli_error($db));
+				}
+				else{
+					$reactCount	=	mysqli_num_rows($react_res);
+				}
+
 				if($date_time_diff->y != 0){
 					$date_time 		= 	$date_time_diff->format('%y year' . (($date_time_diff->y > 1)? 's' : '') . ' ago');
 				}
@@ -517,8 +535,12 @@
 						<div class="author-image" data="<?php echo $author_id ?>"><img src="admin/dist/img/users/<?php echo (empty($author_image))?  'default-img.png' :  $author_image ?>"  alt="Author Image"></div>
 						<div class="author" data="<?php echo $author_id ?>"><?php echo $author_name; ?></div>
 						<div class="time-delta"><?php echo $date_time ?></div>
+						<div class="comment-reactions ms-auto text-info">
+							<span class="react-count"><?php echo $reactCount ?></span>
+							reactions
+						</div>
 						<?php if($logged_user_id === $author_id) {?>
-							<div class="user-control ms-auto">
+							<div class="user-control">
 								<i class="fas fa-ellipsis-h" id="dropdownMenuLink" data-bs-toggle="dropdown"></i>
 								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
 							    <li class="dropdown-item edit-comment">Edit</li>
@@ -531,10 +553,10 @@
 					<div class="comment-action">
 						<ul class="action-list">
 							<li>
-								<span class="action like">like</span>
+								<span class="action react <?php echo ($reacted)? "reacted" : "" ?>"><?php echo ($reacted)? "Liked" : "React" ?></span>
 							</li>
 							<li>
-								<span class="action reply show">reply</span>
+								<span class="action reply show">Reply</span>
 							</li>
 						</ul>
 					</div>

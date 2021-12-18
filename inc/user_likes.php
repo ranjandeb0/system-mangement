@@ -106,6 +106,60 @@
 	}
 	else if($type == "comment"){
 		$comment_id 	= 	mysqli_real_escape_string($db, $_POST['commentData']);
+		
+		if($task == "react"){
+			$sql 	=	"SELECT id FROM comment_reactions WHERE comment_id = '$comment_id' AND user_id = '$logged_user_id'";
+			$res 	= 	mysqli_query($db, $sql);
+			if(!$res){
+				die("Error: " . mysqli_error($db));
+			}
+			else{
+				if (mysqli_num_rows($res) == 0) {
+					$sql 	=	"INSERT INTO comment_reactions (user_id, comment_id, reaction_type) VALUES ('$logged_user_id', '$comment_id', '$reaction_type')";
+					$res 	=	mysqli_query($db, $sql);
+					if(!$res){
+						die("Error: " . mysqli_error($db));
+					}else{
+						echo "success";
+					}
+				}
+				else{
+					echo "already is";
+				}
+			}
+		}
+		else if($task == "undoReact"){
+			$sql 	=	"SELECT id FROM comment_reactions WHERE comment_id = '$comment_id' AND user_id = '$logged_user_id'";
+			$res 	= 	mysqli_query($db, $sql);
+			if(!$res){
+				die("Error: " . mysqli_error($db));
+			}
+			else{
+				if (mysqli_num_rows($res) != 0) {
+					$sql 	=	"DELETE FROM comment_reactions WHERE comment_id = '$comment_id' AND user_id = '$logged_user_id'";
+					$res 	=	mysqli_query($db, $sql);
+					if(!$res){
+						die("Error: " . mysqli_error($db));
+					}else{
+						echo "success";
+					}
+				}
+				else{
+					echo "Does not exist";
+				}
+			}
+		}
+		else if($task == "changeReactType"){}
+		else if($task == "countReact"){
+			$sql 	=	"SELECT id FROM comment_reactions WHERE comment_id = '$comment_id'";
+			$res 	= 	mysqli_query($db, $sql);
+			if(!$res){
+				die("Error: " . mysqli_error($db));
+			}
+			else{
+				echo mysqli_num_rows($res);
+			}
+		}
 	}
 
 	ob_end_flush();
