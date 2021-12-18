@@ -271,8 +271,12 @@ header .cat-nav .dropdown-menu{
     background: #3c434a;
     transition: 0.3s ease-in-out;
 }
-.read-post .post .actions ul li:hover{
+.read-post .post .actions ul li:not(.reacted):hover{
 	background: #474f56;
+}
+.read-post .post .react-btn.reacted{
+	background: #344a60;
+    color: #0393ff;
 }
 .comment .comment-info{
 	display: flex;
@@ -337,7 +341,7 @@ header .cat-nav .dropdown-menu{
     border-radius: 5px;
     margin: 9px 0 1px -2px;
 }
-.comment .user-control i{
+.user-control i{
 	padding: 5px;
     font-size: 13px;
     cursor: pointer;
@@ -364,6 +368,10 @@ header .cat-nav .dropdown-menu{
 	background: #3c434a;
 	color: #fff;
 	transition: 0.2s ease-in;
+}
+.comment .reply-container{
+	padding-left: 24px;
+	border-left: 1px solid #fff;
 }
 .comment-box span+span{
 	margin: 0 15px;

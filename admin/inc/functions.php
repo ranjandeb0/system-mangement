@@ -459,7 +459,7 @@
     }
 	}
 
-	function readAndPrintComments($db, $comment_res, bool $reply = false, int $limit = 0, int $singleComment = 0, int $fromBefore = 0){
+	function readAndPrintComments($db, $comment_res, bool $reply = false, int $limit = 0, int $singleComment = 0, int $fromBefore = 0, int $fromAfter = 0){
 		global $logged_user_id;
 
 		if(! $comment_res instanceof mysqli_result){
@@ -467,11 +467,16 @@
 				$sql = "SELECT * FROM comments WHERE reply_of = '$comment_res' and status = '1' ORDER BY id asc". (($limit > 0)? " LIMIT {$limit}": "");
 			}else{
 				if($fromBefore > 0){
-					$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$comment_res'". (($singleComment > 0) ? " AND id = '{$singleComment}' OR id < '{$fromBefore}'": "AND id < '{$fromBefore}'") . " and status = '1' ORDER BY id desc". (($limit > 0) ? " LIMIT {$limit}": "");
+					$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$comment_res'". (($singleComment > 0) ? " AND id = '{$singleComment}' OR id < '{$fromBefore}'": " AND id < '{$fromBefore}'") . " and status = '1' ORDER BY id desc". (($limit > 0) ? " LIMIT {$limit}": "");
 				}
 				else{
-					$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$comment_res'". (($singleComment > 0) ? " and id = '{$singleComment}'": "") . " and status = '1' ORDER BY id desc". (($limit > 0) ? " LIMIT {$limit}": "");
-				}
+					if($fromAfter > 0){
+						$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$comment_res'". (($singleComment > 0) ? " AND id = '{$singleComment}' OR id > '{$fromAfter}'": "AND id > '{$fromAfter}'") . " and status = '1' ORDER BY id desc". (($limit > 0) ? " LIMIT {$limit}": "");
+					}
+					else{
+						$sql  = "SELECT * FROM comments WHERE reply_of is null and post_id='$comment_res'". (($singleComment > 0) ? " and id = '{$singleComment}'": "") . " and status = '1' ORDER BY id desc". (($limit > 0) ? " LIMIT {$limit}": "");
+					}
+				}					
 			}
 			$comment_res = mysqli_query($db, $sql);
 			if (!$comment_res) {
@@ -529,7 +534,7 @@
 								<span class="action like">like</span>
 							</li>
 							<li>
-								<span class="action reply">reply</span>
+								<span class="action reply show">reply</span>
 							</li>
 						</ul>
 					</div>
@@ -540,7 +545,7 @@
 							die("Error: " . mysqli_error($db));
 						}
 						if(mysqli_num_rows($sub_res) > 0){
-							echo "<span class='view-replies link-colored' data='{$id}'>---See replies</span>";
+							echo "<span class='view-replies link-colored'>See replies</span>";
 						}
 					?>
 				</div>
@@ -548,10 +553,10 @@
 		}
 	}
 
-	function generateCommentForm(int $post_parent_id){
+	function generateCommentForm(){
 		global $logged_user_image;
 		?>
-			<form style="display:none" class="comment-form mt-3" data="<?php echo $post_parent_id ?>">
+			<form style="display:none" class="comment-form mt-3">
  				<div class="user-image ms-auto">
 					<img src="admin/dist/img/users/<?php echo (empty($logged_user_image))?  'default-img.png' :  $logged_user_image ?>"  alt="User Image">
 				</div>

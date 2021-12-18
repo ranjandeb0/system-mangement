@@ -105,6 +105,24 @@
 					                    $metatags       =   $row['metatags'];
 					                    $status         =   $row['status'];
 
+					                    $sql  = "SELECT * FROM post_reactions WHERE post_id='$post_id'";
+										$react_res	= mysqli_query($db, $sql);
+										if(!$react_res){
+											die("MySqli Error: " . mysqli_error($db));
+										}
+										else{
+											$react_count	=	mysqli_num_rows($react_res);
+										}
+
+										$sql  = "SELECT * FROM post_reactions WHERE post_id='$post_id' AND user_id='$logged_user_id'";
+										$react_res	= mysqli_query($db, $sql);
+										if(!$react_res){
+											die("MySqli Error: " . mysqli_error($db));
+										}
+										else{
+											$reacted	=	mysqli_num_rows($react_res);
+										}
+
 					                    $sql  = "SELECT * FROM comments WHERE reply_of is not null and post_id='$post_id' and status = '1'";
 										$comment_res	= mysqli_query($db, $sql);
 										if(!$comment_res){
@@ -173,13 +191,13 @@
 												<p><?php echo $post_content?></p>
 											</div>
 											<div class="post-info">
-												<p class="m-0 text-info"> 13 People Likes this</p>
-												<p class="m-0 text-info"> <?php echo "{$comments_count} comment". (($comments_count>1)? "s": "") ." & {$replies_count} ". (($replies_count>1)? "replies": "reply") ?></p>
+												<p class="m-0 text-info"><span class="post-react-count"><?php echo $react_count ?></span> People reacted to this post</p>
+												<p class="m-0 text-info"> <span class="post-comment-count"><?php echo "{$comments_count}</span> comment". (($comments_count>1)? "s": "") ." & <span class='post-reply-count'>{$replies_count}</span> ". (($replies_count>1)? "replies": "reply") ?></p>
 											</div>
 											<?php if($loggedIn){ ?>
 													<div class="actions mb-2">
 														<ul>
-															<li class="like-btn">Like</li>
+															<li class="react-btn <?php echo ($reacted)? "reacted" : "" ?>" title="<?php echo ($reacted)? "click to unreact" : "click to react" ?>"> <?php echo ($reacted)? "Liked" : "React" ?></li>
 															<li class="comment-gen-btn show" data ="<?php echo $post_id ?>">Comment</li>
 															<li class="follow-btn">Follow</li>
 														</ul>
